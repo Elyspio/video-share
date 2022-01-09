@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+    video-share-db:
+        container_name: video-share-db
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: mysecretpassword42
+        volumes:
+            - ./data:/data/db
+        ports:
+            - "6004:27017"

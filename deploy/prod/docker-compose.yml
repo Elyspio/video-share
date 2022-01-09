@@ -1,0 +1,35 @@
+version: "3"
+services:
+
+    # app
+    video-share:
+        image: elyspio/video-share:latest
+        container_name: video-share
+        restart: always
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=external"
+            - "traefik.http.middlewares.video-share-prefix.stripprefix.prefixes=/video-share"
+            - "traefik.http.routers.video-share.middlewares=video-share-prefix@docker"
+            - "traefik.http.routers.video-share.rule=PathPrefix(`/video-share`)"
+            - "traefik.http.services.video-share.loadbalancer.server.port=4000"
+            - "traefik.http.routers.video-share.entrypoints=external"
+        volumes:
+                - ./config/front/conf.js:/front/conf.js
+        environment:
+            FILE_SERVE_USERNAME: ${FILE_SERVE_USERNAME}
+            FILE_SERVE_PASSWORD: ${FILE_SERVE_PASSWORD}
+            FILE_SERVE_SERVER_URI: "https://elyspio.fr/file-serve"
+
+        networks:
+            - video-share
+            - external
+
+networks:
+    video-share:
+        name: "video-share"
+    external:
+        external: true
+    internal:
+        external: true
+
