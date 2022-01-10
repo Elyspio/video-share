@@ -43,6 +43,7 @@ public static class Adapters
 
         services.AddHttpClient<IUserFilesClient, UserFilesClient>(client =>
         {
+            client.Timeout = TimeSpan.FromHours(1);
             client.BaseAddress = new Uri(fileServeUrl ??
                                          $"{configuration["FileServeServer:Scheme"]}://{configuration["FileServeServer:Host"]}:{configuration["FileServeServer:Port"]}");
         });
