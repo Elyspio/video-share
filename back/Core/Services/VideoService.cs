@@ -35,11 +35,36 @@ internal class VideoService : IVideoService
         return video;
     }
 
+
+    public async Task DownloadVideo(string idVideo, string path)
+    {
+        var video = await videoRepository.GetVideo(idVideo);
+        var token = await authenticationService.Login();
+
+        var fileResponse = await filesClient.GetFileContent2Async(video.IdFile, token, token);
+
+
+        await using var memoryStream = new MemoryStream();
+        await fileResponse.Stream.CopyToAsync(memoryStream);
+
+        await File.WriteAllBytesAsync(path, memoryStream.ToArray());
+    }
+
+    public async Task<Video> LinkVideo(string idVideo, string idCreated)
+    {
+        return await videoRepository.LinkVideo(idVideo, idCreated);
+    }
+
     public async Task DeleteVideo(string idVideo)
     {
         var token = await authenticationService.Login();
         var file = await videoRepository.GetVideo(idVideo);
         await filesClient.DeleteFile2Async(file.IdFile, token, token);
         await videoRepository.DeleteVideo(idVideo);
+    }
+
+    public async Task<Video> GetVideo(string idVideo)
+    {
+        return await videoRepository.GetVideo(idVideo);
     }
 }

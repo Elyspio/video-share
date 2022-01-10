@@ -26,4 +26,28 @@ public interface IVideoService
     /// <param name="idVideo"></param>
     /// <returns></returns>
     Task DeleteVideo(string idVideo);
+
+    /// <summary>
+    ///     Get a video from its id
+    /// </summary>
+    /// <param name="idVideo">id of the video</param>
+    /// <returns></returns>
+    Task<Video> GetVideo(string idVideo);
+
+
+    /// <summary>
+    ///     Download a video into a path
+    /// </summary>
+    /// <param name="idVideo"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public Task DownloadVideo(string idVideo, string path);
+
+    /// <summary>
+    ///     Link a video to its converted file
+    /// </summary>
+    /// <param name="idVideo"></param>
+    /// <param name="idCreated"></param>
+    /// <returns></returns>
+    Task<Video> LinkVideo(string idVideo, string idCreated);
 }

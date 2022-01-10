@@ -7,10 +7,10 @@ public interface IConverterService
     /// <summary>
     ///     Convert a video to a different format
     /// </summary>
-    /// <param name="fileId">video (file)'s id</param>
+    /// <param name="idVideo">video (file)'s id</param>
     /// <param name="format">new format</param>
     /// <returns></returns>
-    Task<string> Convert(string fileId, VideoFormat format);
+    Task<string> Convert(string idVideo, VideoFormat format);
 
 
     /// <summary>

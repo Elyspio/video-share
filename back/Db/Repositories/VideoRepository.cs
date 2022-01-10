@@ -23,21 +23,12 @@ internal class VideoRepository : BaseRepository<VideoEntity>, IVideoRepository
     }
 
 
-    public async Task<Video> SetVideoConverted(string idVideo, bool converted)
-    {
-        var video = await EntityCollection.Find(v => v.Id == new ObjectId(idVideo)).FirstOrDefaultAsync();
-        if (video == null) throw new VideoNotFoundException(idVideo);
-        video.Converted = converted;
-        await EntityCollection.ReplaceOneAsync(v => v.Id == new ObjectId(idVideo), video);
-        return assembler.Convert(video);
-    }
-
-    public async Task<Video> CreateVideo(string idFile, bool converted = false)
+    public async Task<Video> CreateVideo(string idFile)
     {
         var video = new VideoEntity
         {
             IdFile = idFile,
-            Converted = converted
+            IdConvertedFile = null
         };
         await EntityCollection.InsertOneAsync(video);
         return assembler.Convert(video);
@@ -60,5 +51,14 @@ internal class VideoRepository : BaseRepository<VideoEntity>, IVideoRepository
     {
         var videos = await EntityCollection.Find(_ => true).ToListAsync();
         return assembler.Convert(videos);
+    }
+
+    public async Task<Video> LinkVideo(string idVideo, string idCreated)
+    {
+        var video = await EntityCollection.Find(v => v.Id == new ObjectId(idVideo)).FirstOrDefaultAsync();
+        if (video == null) throw new VideoNotFoundException(idVideo);
+        video.IdConvertedFile = idCreated;
+        await EntityCollection.ReplaceOneAsync(v => v.Id == new ObjectId(idVideo), video);
+        return assembler.Convert(video);
     }
 }

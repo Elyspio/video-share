@@ -11,7 +11,7 @@ public class VideoAssembler : BaseAssembler<Video, VideoEntity>
     {
         return new VideoEntity
         {
-            Converted = obj.Converted,
+            IdConvertedFile = obj.IdConvertedFile,
             Id = new ObjectId(obj.Id),
             IdFile = obj.IdFile
         };
@@ -21,7 +21,7 @@ public class VideoAssembler : BaseAssembler<Video, VideoEntity>
     {
         return new Video
         {
-            Converted = obj.Converted,
+            IdConvertedFile = obj.IdConvertedFile,
             Id = obj.Id.ToString(),
             IdFile = obj.IdFile
         };

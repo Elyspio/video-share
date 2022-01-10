@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Web.Filters;
+using Web.Hubs;
 using Web.Utils;
 
 var frontPath = Env.Get<string>("FRONT_PATH") ?? "/front";
@@ -44,7 +45,8 @@ var useBuilder = () =>
         .AddClasses(classes => classes.InNamespaces(
             "Core.Services",
             "Db.Repositories",
-            "Db.Repositories.Internal"
+            "Db.Repositories.Internal",
+            "Web.Hubs"
         ))
         .AsImplementedInterfaces()
         .WithSingletonLifetime());
@@ -68,6 +70,7 @@ var useBuilder = () =>
             o.OutputFormatters.RemoveType<StringOutputFormatter>();
         })
         .AddJsonOptions(x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    builder.Services.AddSignalR();
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -102,11 +105,22 @@ var useApp = (WebApplication application) =>
     // Start Dependency Injection
     application.UseAdvancedDependencyInjection();
 
+
+    // Setup Hubs
+    app.UseRouting();
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapHub<ConversionHub>("/hubs/conversion");
+        endpoints.MapHub<PlayerHub>("/hubs/player");
+    });
+
+
     // Allow CORS
     application.UseCors("Cors");
 
     // Setup Controllers
     application.MapControllers();
+
 
     // Start SPA serving
     if (application.Environment.IsProduction())
