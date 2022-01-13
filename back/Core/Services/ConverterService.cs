@@ -14,37 +14,59 @@ internal class ConverterService : IConverterService
     private readonly IVideoService videoService;
 
     public ConverterService(IUserFilesClient filesClient, IVideoService videoService,
-        IAuthenticationService authenticationService)
+        IAuthenticationService authenticationService, IConversionHub conversionHub)
     {
         this.filesClient = filesClient;
         this.videoService = videoService;
         this.authenticationService = authenticationService;
+        this.conversionHub = conversionHub;
     }
 
     public async Task<string> Convert(string idVideo, VideoFormat format)
     {
-        var rawVideoPath = Path.GetTempFileName();
-        await videoService.DownloadVideo(idVideo, rawVideoPath);
 
+        var video = await this.videoService.GetVideo(idVideo);
+
+        if (video.IdConvertedFile != null) return video.IdConvertedFile;
+
+        var rawVideoPath = Path.GetTempFileName();
         var ffmpeg = new FFmpeg.FFmpeg(rawVideoPath, VideoFormat.Streamable);
 
-        ffmpeg.OnProgress += progression => { conversionHub.UpdateConversionProgression(idVideo, progression); };
-
-        var data = await ffmpeg.Convert();
-
-        var token = await authenticationService.Login();
-        var video = await videoService.GetVideo(idVideo);
-        var rawFileMetadata = await filesClient.GetFile2Async(video.IdFile, token, token);
+        try
+        {
+            await videoService.DownloadVideo(idVideo, rawVideoPath);
 
 
-        var container = rawFileMetadata.Location[..rawFileMetadata.Location.LastIndexOf("/")];
-        var created = await filesClient.AddFile2Async(token, token, rawFileMetadata.Filename, $"{container}/converted",
-            new FileParameter(new MemoryStream(data), rawFileMetadata.Filename));
+            ffmpeg.OnProgress += progression => { conversionHub.UpdateConversionProgression(idVideo, progression); };
 
-        await videoService.LinkVideo(idVideo, created.Id);
-        await conversionHub.UpdateConversionProgression(idVideo, 100);
+            var data = await ffmpeg.Convert();
 
-        return created.Id;
+            var token = await authenticationService.Login();
+            var rawFileMetadata = await filesClient.GetFile2Async(video.IdFile, token, token);
+
+
+            var container = rawFileMetadata.Location[..rawFileMetadata.Location.LastIndexOf("/")];
+            var created = await filesClient.AddFile2Async(token, token, rawFileMetadata.Filename, $"{container}/converted",
+                new FileParameter(new MemoryStream(data), rawFileMetadata.Filename, rawFileMetadata.Mime));
+
+            await videoService.LinkVideo(idVideo, created.Id);
+            await conversionHub.UpdateConversionProgression(idVideo, 100);
+
+            return created.Id;
+        }
+        finally
+        {
+            if (File.Exists(rawVideoPath))
+            {
+                File.Delete(rawVideoPath);
+            }
+            ffmpeg.Clean();
+        }
+
+        return video.IdConvertedFile;
+
+
+
     }
 
 

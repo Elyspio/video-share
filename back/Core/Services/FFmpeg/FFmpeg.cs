@@ -69,7 +69,8 @@ public class FFmpeg
         var parts = stream.AvgFrameRate.Split("/");
         var framerate = (long)(double.Parse(parts[0]) / double.Parse(parts[1]));
 
-        return framerate * long.Parse(properties.Format.Duration);
+        var replace = properties.Format.Duration.Replace(".", ",");
+        return (long) (framerate * double.Parse(replace));
     }
 
 
@@ -78,6 +79,14 @@ public class FFmpeg
         var data = chunk.Split("\n").Select(line => line.Split("=")).ToArray();
 
         return long.Parse(data[0][1]);
+    }
+
+    public void Clean()
+    {
+        if(File.Exists(output))
+        {
+            File.Delete(output);
+        }
     }
 }
 // ffmpeg  -i '.\Mushoku Tensei - 01.mkv' -c:v h264_nvenc -vf subtitles='Mushoku Tensei - 01.mkv'  -pix_fmt yuvj420p -y '.\Mushoku Tensei - 01.mp4'

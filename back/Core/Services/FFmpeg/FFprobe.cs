@@ -190,29 +190,25 @@ public class StreamTags
 
 public class FFprobe
 {
-    private static readonly string ffprobePath = Env.Get("FFPROBE_PATH", "ffprobe.exe");
+    private static readonly string ffprobePath = Env.Get("FFPROBE_PATH", @"C:\Program Files\FFmpeg\bin\ffprobe.exe");
 
     public static async Task<FFprobeResult> GetFileInfos(string path)
     {
-        var proc = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = ffprobePath,
-                Arguments = $" -v quiet -print_format json -show_format -show_streams '{path}'",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
-        };
+        using var compiler = new Process();
+        compiler.StartInfo.WorkingDirectory = Path.GetTempPath();  
+        compiler.StartInfo.FileName = ffprobePath;
+        compiler.StartInfo.Arguments = $" -v quiet -print_format json -show_format -show_streams \"{path}\"";
+        compiler.StartInfo.UseShellExecute = false;
+        compiler.StartInfo.RedirectStandardOutput = true;
+        compiler.StartInfo.RedirectStandardError = true;
+        compiler.Start();
 
-        proc.Start();
-        var sb = new StringBuilder();
-        await Task.Run(() =>
-        {
-            while (!proc.StandardOutput.EndOfStream) sb.Append(proc.StandardOutput.ReadLine());
-        });
-        return JsonConvert.DeserializeObject<FFprobeResult>(sb.ToString(), Converter.Settings)!;
+        var json = await compiler.StandardOutput.ReadToEndAsync();
+
+
+        await compiler.WaitForExitAsync();
+
+        return JsonConvert.DeserializeObject<FFprobeResult>(json, Converter.Settings)!;
     }
 }
 

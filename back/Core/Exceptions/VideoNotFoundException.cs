@@ -3,7 +3,7 @@
 public class VideoNotFoundException : Exception
 {
     public VideoNotFoundException(string idVideo) : base(
-        $"Could not found the video {idVideo}")
+        $"Could not find the video {idVideo}")
     {
     }
 }
