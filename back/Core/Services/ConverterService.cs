@@ -37,7 +37,11 @@ internal class ConverterService : IConverterService
             await videoService.DownloadVideo(idVideo, rawVideoPath);
 
 
-            ffmpeg.OnProgress += progression => { conversionHub.UpdateConversionProgression(idVideo, progression); };
+            ffmpeg.OnProgress = progression =>
+            {
+                Console.WriteLine("FFmpeg Progression " + progression);
+                conversionHub.UpdateConversionProgression(idVideo, progression);
+            };
 
             var data = await ffmpeg.Convert();
 
@@ -46,8 +50,16 @@ internal class ConverterService : IConverterService
 
 
             var container = rawFileMetadata.Location[..rawFileMetadata.Location.LastIndexOf("/")];
-            var created = await filesClient.AddFile2Async(token, token, rawFileMetadata.Filename, $"{container}/converted",
-                new FileParameter(new MemoryStream(data), rawFileMetadata.Filename, rawFileMetadata.Mime));
+
+            var createdFilename = $"{Path.GetFileNameWithoutExtension(rawFileMetadata.Filename)}.mp4";
+
+            var created = await filesClient.AddFile2Async(
+                token, 
+                token,
+                createdFilename, 
+                $"{container}/converted",
+                new FileParameter(new MemoryStream(data), createdFilename, rawFileMetadata.Mime)
+            );
 
             await videoService.LinkVideo(idVideo, created.Id);
             await conversionHub.UpdateConversionProgression(idVideo, 100);
@@ -62,9 +74,6 @@ internal class ConverterService : IConverterService
             }
             ffmpeg.Clean();
         }
-
-        return video.IdConvertedFile;
-
 
 
     }

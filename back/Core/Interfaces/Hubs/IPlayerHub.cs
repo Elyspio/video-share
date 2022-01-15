@@ -4,5 +4,5 @@ namespace Core.Interfaces.Hubs;
 
 public interface IPlayerHub
 {
-    public Task UpdateVideoState(string idVideo, VideoState state);
+    public Task UpdateVideoState(string idVideo, RoomState state);
 }

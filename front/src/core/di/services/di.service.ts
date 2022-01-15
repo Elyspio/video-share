@@ -3,11 +3,11 @@ import { ThemeService } from "../../services/theme.service";
 import { LocalStorageService } from "../../services/localStorage.service";
 import { DiKeysService } from "./di.keys.service";
 import { container } from "../index";
-import { ExampleService } from "../../services/example.service";
+import { VideoService } from "../../services/video.service";
 
 container.bind<AuthenticationService>(DiKeysService.authentication).to(AuthenticationService);
 
-container.bind<ExampleService>(DiKeysService.example).to(ExampleService);
+container.bind<VideoService>(DiKeysService.video).to(VideoService);
 
 container.bind<ThemeService>(DiKeysService.theme).to(ThemeService);
 

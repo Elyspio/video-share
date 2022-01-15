@@ -5,7 +5,7 @@ namespace Core.Interfaces.Repositories;
 
 public interface IRoomRepository
 {
-    Task<Room> UpdateRoomState(string idRoom, VideoState state);
+    Task<Room> UpdateRoomState(string idRoom, RoomState state);
     Task<Room> CreateRoom(string idVideo, string filename, string location);
     Task DeleteRoom(string idRoom);
 

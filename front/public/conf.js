@@ -1,6 +1,6 @@
 window.config = {
 	endpoints: {
-		core: "http://localhost",
+		core: "http://localhost/api",
 		authentication: "http://localhost/authentication",
 	},
 	loginPageUrl: "http://localhost/authentication",

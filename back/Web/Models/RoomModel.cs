@@ -16,5 +16,5 @@ public class RoomModel
     [Required] [NotNull] public string FileName { get; set; }
     [Required] [NotNull] public string IdVideo { get; set; }
     [Required] [NotNull] public string Location { get; set; }
-    [Required] public VideoState State { get; set; }
+    [Required] public RoomState State { get; set; }
 }

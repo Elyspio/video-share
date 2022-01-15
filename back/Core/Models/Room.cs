@@ -12,5 +12,5 @@ public class Room
     public string FileName { get; set; }
     public string IdVideo { get; set; }
     public string Location { get; set; }
-    public VideoState State { get; set; }
+    public RoomState State { get; set; }
 }

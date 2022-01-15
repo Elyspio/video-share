@@ -8,10 +8,10 @@ public class FFmpeg
 {
     private readonly string input;
 
-    private readonly string output = Env.Get("OUTPUT_FILE_PATH", Path.GetTempFileName())!;
+    private readonly string output = Env.Get("OUTPUT_FILE_PATH", Path.GetTempFileName() + ".mp4")!;
     private readonly Process proc;
 
-    private readonly string ffmpegPath = Env.Get("FFMPEG_PATH", "ffmpeg.exe");
+    private readonly string ffmpegPath = Env.Get("FFMPEG_PATH", @"C:\Program Files\FFmpeg\bin\ffmpeg.exe");
 
 
     public Action<double> OnProgress = d => { };
@@ -31,13 +31,17 @@ public class FFmpeg
             StartInfo = new ProcessStartInfo
             {
                 FileName = ffmpegPath,
-                Arguments = $"-i '{input}' -c:v {formatStr} -vf subtitles='{input}'  -pix_fmt yuvj420p -y '{output}' ",
+                Arguments = $"-i \"{input}\" -c:v \"{formatStr}\" -vf subtitles=\"{Path.GetFileName(input)}\"  -pix_fmt yuv420p -y \"{output}\" ",
+                WorkingDirectory = Path.GetDirectoryName(output),
+                CreateNoWindow = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden
 
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
             }
         };
+
+        proc.EnableRaisingEvents = true;
     }
 
     /// <summary>
@@ -48,17 +52,34 @@ public class FFmpeg
     {
         var nbFrames = await GetFramesCount();
 
-        proc.OutputDataReceived += (_, e) =>
+        proc.ErrorDataReceived += (proc, e) =>
         {
+            Console.WriteLine("Error " +  e.Data?.ToString());
             if (e.Data == null) return;
-            var currentFrame = GetCurrentFrame(e.Data);
-            var percentage = currentFrame / (double)nbFrames * 100;
-            OnProgress(percentage);
+            if (e.Data.Contains("frame="))
+            {
+                var currentFrame = GetCurrentFrame(e.Data);
+                var percentage = currentFrame / (double)nbFrames * 100;
+
+                if(percentage > 100) percentage = 100;
+
+                OnProgress(percentage);
+            }
         };
 
+
         proc.Start();
+        proc.BeginErrorReadLine();
         await proc.WaitForExitAsync();
-        return await File.ReadAllBytesAsync(output);
+
+        if (proc.ExitCode != 0)
+        {
+            var stderr = await proc.StandardError.ReadToEndAsync();
+            throw new Exception("FFmpeg error: " + stderr);
+        }
+
+        var content =  await File.ReadAllBytesAsync(output);
+        return content;
     }
 
 
@@ -67,10 +88,10 @@ public class FFmpeg
         var properties = await FFprobe.GetFileInfos(input);
         var stream = properties.Streams.Find(stream => stream.CodecType == "video")!;
         var parts = stream.AvgFrameRate.Split("/");
-        var framerate = (long)(double.Parse(parts[0]) / double.Parse(parts[1]));
+        var framerate = (long)Math.Round(double.Parse(parts[0]) / double.Parse(parts[1]));
 
         var replace = properties.Format.Duration.Replace(".", ",");
-        return (long) (framerate * double.Parse(replace));
+        return (long)Math.Round(framerate * double.Parse(replace));
     }
 
 
@@ -78,7 +99,7 @@ public class FFmpeg
     {
         var data = chunk.Split("\n").Select(line => line.Split("=")).ToArray();
 
-        return long.Parse(data[0][1]);
+         return long.Parse(data[0][1].Trim().Split(" ")[0]);
     }
 
     public void Clean()

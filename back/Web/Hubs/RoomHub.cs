@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Web.Hubs;
 
-public class PlayerHub : Hub, IPlayerHub
+public class RoomHub : Hub, IPlayerHub
 {
 
-    private readonly IHubContext<PlayerHub> context;
+    private readonly IHubContext<RoomHub> context;
 
-    public PlayerHub(IHubContext<PlayerHub> context)
+    public RoomHub(IHubContext<RoomHub> context)
     {
         this.context = context;
     }
-    public async Task UpdateVideoState(string idVideo, VideoState state)
+    public async Task UpdateVideoState(string idVideo, RoomState state)
     {
         await context.Clients.All.SendAsync("update-video-state", idVideo, state);
     }

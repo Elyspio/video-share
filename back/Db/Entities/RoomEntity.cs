@@ -14,5 +14,5 @@ public class RoomEntity
     public string Location { get; set; }
     public string FileName { get; set; }
 
-    public VideoState State { get; set; }
+    public RoomState State { get; set; }
 }

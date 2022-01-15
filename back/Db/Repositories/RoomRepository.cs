@@ -24,7 +24,7 @@ internal class RoomRepository : BaseRepository<RoomEntity>, IRoomRepository
     }
 
 
-    public async Task<Room> UpdateRoomState(string idRoom, VideoState state)
+    public async Task<Room> UpdateRoomState(string idRoom, RoomState state)
     {
         var room = await EntityCollection
             .Find(room => room.Id == new ObjectId(idRoom))

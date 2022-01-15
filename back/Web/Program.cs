@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json.Serialization;
 using Adapters;
+using Core.Interfaces.Hubs;
 using Core.Utils;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Serilog;
@@ -39,6 +40,9 @@ var useBuilder = () =>
     builder.Services.AddAdapters(builder.Configuration);
 
 
+    //builder.Services.AddSingleton<IConversionHub, ConversionHub>();
+    //builder.Services.AddSingleton<IPlayerHub, PlayerHub>();
+
     // Inject Services
     builder.Services.Scan(scan => scan
         .FromApplicationDependencies()
@@ -70,7 +74,6 @@ var useBuilder = () =>
             o.OutputFormatters.RemoveType<StringOutputFormatter>();
         })
         .AddJsonOptions(x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-    builder.Services.AddSignalR();
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -87,6 +90,9 @@ var useBuilder = () =>
         Console.WriteLine($"Server in production, serving SPA from {frontPath} folder");
 
     // builder.Services.AddSpaStaticFiles(configuration => { configuration.RootPath = frontPath; });
+
+    builder.Services.AddSignalR()
+    .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 
     return builder;
@@ -105,19 +111,19 @@ var useApp = (WebApplication application) =>
     // Start Dependency Injection
     application.UseAdvancedDependencyInjection();
 
+    // Allow CORS
+    application.UseCors("Cors");
 
     // Setup Hubs
     app.UseRouting();
     app.UseEndpoints(endpoints =>
     {
         endpoints.MapHub<ConversionHub>("/hubs/conversion");
-        endpoints.MapHub<PlayerHub>("/hubs/player");
+        endpoints.MapHub<RoomHub>("/hubs/room");
     });
 
 
-    // Allow CORS
-    application.UseCors("Cors");
-
+    
     // Setup Controllers
     application.MapControllers();
 

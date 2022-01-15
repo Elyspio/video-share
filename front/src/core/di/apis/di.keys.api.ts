@@ -1,4 +1,5 @@
 export const DiKeysApi = {
 	authentication: Symbol.for("AuthenticationApi"),
-	example: Symbol.for("ExampleApi"),
+	video: Symbol.for("VideoApi"),
+	room: Symbol.for("RoomApi"),
 };

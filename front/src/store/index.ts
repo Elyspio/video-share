@@ -1,16 +1,29 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { themeReducer } from "./module/theme/theme.reducer";
 import { authenticationReducer } from "./module/authentication/authentication.reducer";
+import { connectRouter, routerMiddleware } from "connected-react-router";
+import { createBrowserHistory } from "history";
+import { videosReducer } from "./module/videos/videos.reducer";
 
-const store = configureStore({
-	reducer: {
-		theme: themeReducer,
-		authentication: authenticationReducer,
-	},
-	devTools: process.env.NODE_ENV !== "production",
+export const history = createBrowserHistory({
+	basename: "/videos-share",
 });
 
+const createRootReducer = (history) =>
+	combineReducers({
+		router: connectRouter(history),
+		theme: themeReducer,
+		authentication: authenticationReducer,
+		videos: videosReducer,
+		// rest of your reducers
+	});
+
+const store = configureStore({
+	reducer: createRootReducer(history),
+	devTools: process.env.NODE_ENV !== "production",
+	middleware: (getDefaultMiddleware) => [routerMiddleware(history), ...getDefaultMiddleware()],
+});
 export type StoreState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 

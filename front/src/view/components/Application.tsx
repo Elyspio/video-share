@@ -2,13 +2,17 @@ import * as React from "react";
 import "./Application.scss";
 import Brightness5Icon from "@mui/icons-material/Brightness5";
 import Brightness3Icon from "@mui/icons-material/Brightness3";
-import Example from "./test/Test";
+import Videos from "./videos/Videos";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { toggleTheme } from "../../store/module/theme/theme.action";
 import { createDrawerAction, withDrawer } from "./utils/drawer/Drawer.hoc";
 import { Box } from "@mui/material";
 import { login, logout } from "../../store/module/authentication/authentication.action";
 import { Login, Logout } from "@mui/icons-material";
+import { Route, Switch as SwitchRouter } from "react-router";
+
+import { routes } from "../../config/routes";
+import { AddVideo } from "./videos/AddVideo";
 
 function Application() {
 	const dispatch = useAppDispatch();
@@ -31,21 +35,24 @@ function Application() {
 			createDrawerAction("Logout", {
 				icon: <Logout fill={"currentColor"} />,
 				onClick: () => dispatch(logout()),
-			})
+			}),
 		);
 	} else {
 		actions.push(
 			createDrawerAction("Login", {
 				icon: <Login fill={"currentColor"} />,
 				onClick: () => dispatch(login()),
-			})
+			}),
 		);
 	}
 
 	const drawer = withDrawer({
-		component: <Example />,
+		component: <SwitchRouter>
+			<Route exact path={routes.home} component={Videos} />
+			<Route exact path={routes.addFile} component={AddVideo} />
+		</SwitchRouter>,
 		actions,
-		title: "Example",
+		title: "Video Share",
 	});
 
 	return (
