@@ -7,7 +7,7 @@ import { createBrowserHistory } from "history";
 import { videosReducer } from "./module/videos/videos.reducer";
 
 export const history = createBrowserHistory({
-	basename: "/videos-share",
+	basename: process.env.NODE_ENV === "production" ? "/video-share": "/",
 });
 
 const createRootReducer = (history) =>

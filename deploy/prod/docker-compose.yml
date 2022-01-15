@@ -15,21 +15,42 @@ services:
             - "traefik.http.services.video-share.loadbalancer.server.port=4000"
             - "traefik.http.routers.video-share.entrypoints=external"
         volumes:
-                - ./config/front/conf.js:/front/conf.js
+            - "./config/front/conf.js:/back/wwwroot/conf.js"
+            - "./config/back/appsettings.json:/back/appsettings.json"
         environment:
-            FILE_SERVE_USERNAME: ${FILE_SERVE_USERNAME}
-            FILE_SERVE_PASSWORD: ${FILE_SERVE_PASSWORD}
-            FILE_SERVE_SERVER_URI: "https://elyspio.fr/file-serve"
-
+            FILESERVE_USERNAME: ${AUTH_USERNAME}
+            FILESERVE_PASSWORD: ${AUTH_PASSWORD}
+            AUTHENTICATION_SERVER_URI: "https://elyspio.fr/authentication/"
         networks:
             - video-share
             - external
+            - authentication
+            - file-serve
+
+
+    video-share-db:
+        container_name: video-share-db
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./data:/data/db
+        networks:
+            - video-share
+        ports:
+            - "27018:27017"
+
+
 
 networks:
     video-share:
         name: "video-share"
     external:
         external: true
-    internal:
+    authentication:
+        external: true
+    file-serve:
         external: true
 

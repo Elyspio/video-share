@@ -9,3 +9,5 @@ deploy/prod/config/front/conf.js
 obj
 bin
 .vs
+deploy/prod/config/back/appsettings.json
+deploy/prod/.env

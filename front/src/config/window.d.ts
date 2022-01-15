@@ -2,6 +2,7 @@ export type Config = {
 	endpoints: {
 		core: string;
 		authentication: string;
+		hubs: string
 	};
 	loginPageUrl: "http://localhost";
 };
