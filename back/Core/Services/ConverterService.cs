@@ -24,8 +24,7 @@ internal class ConverterService : IConverterService
 
     public async Task<string> Convert(string idVideo, VideoFormat format)
     {
-
-        var video = await this.videoService.GetVideo(idVideo);
+        var video = await videoService.GetVideo(idVideo);
 
         if (video.IdConvertedFile != null) return video.IdConvertedFile;
 
@@ -44,6 +43,7 @@ internal class ConverterService : IConverterService
             };
 
             var data = await ffmpeg.Convert();
+            await conversionHub.UpdateConversionProgression(idVideo, 100);
 
             var token = await authenticationService.Login();
             var rawFileMetadata = await filesClient.GetFile2Async(video.IdFile, token, token);
@@ -53,29 +53,30 @@ internal class ConverterService : IConverterService
 
             var createdFilename = $"{Path.GetFileNameWithoutExtension(rawFileMetadata.Filename)}.mp4";
 
-            var created = await filesClient.AddFile2Async(
-                token, 
-                token,
-                createdFilename, 
-                $"{container}/converted",
-                new FileParameter(new MemoryStream(data), createdFilename, rawFileMetadata.Mime)
-            );
+            string idCreated;
 
-            await videoService.LinkVideo(idVideo, created.Id);
-            await conversionHub.UpdateConversionProgression(idVideo, 100);
+            using (var stream = new MemoryStream(data))
+            {
+                var created = await filesClient.AddFile2Async(
+                    token,
+                    token,
+                    createdFilename,
+                    $"{container}/converted",
+                    new FileParameter(stream, createdFilename, "video/mp4")
+                );
 
-            return created.Id;
+                idCreated = created.Id;
+            }
+
+            await videoService.LinkVideo(idVideo, idCreated);
+
+            return idCreated;
         }
         finally
         {
-            if (File.Exists(rawVideoPath))
-            {
-                File.Delete(rawVideoPath);
-            }
+            if (File.Exists(rawVideoPath)) File.Delete(rawVideoPath);
             ffmpeg.Clean();
         }
-
-
     }
 
 

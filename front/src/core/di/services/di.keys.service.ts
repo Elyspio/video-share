@@ -6,4 +6,5 @@ export const DiKeysService = {
 		validation: Symbol.for("LocalStorageService:elyspio-authentication-validation"),
 	},
 	video: Symbol.for("VideoService"),
+	room: Symbol.for("RoomService"),
 };

@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json.Serialization;
 using Adapters;
-using Core.Interfaces.Hubs;
 using Core.Utils;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Serilog;
@@ -92,7 +91,7 @@ var useBuilder = () =>
     // builder.Services.AddSpaStaticFiles(configuration => { configuration.RootPath = frontPath; });
 
     builder.Services.AddSignalR()
-    .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 
     return builder;
@@ -123,7 +122,6 @@ var useApp = (WebApplication application) =>
     });
 
 
-    
     // Setup Controllers
     application.MapControllers();
 
@@ -138,7 +136,7 @@ var useApp = (WebApplication application) =>
         //});
         application.UseDefaultFiles(new DefaultFilesOptions
         {
-            DefaultFileNames = new List<string> { "index.html" }
+            DefaultFileNames = new List<string> {"index.html"}
         });
         application.UseStaticFiles();
     }

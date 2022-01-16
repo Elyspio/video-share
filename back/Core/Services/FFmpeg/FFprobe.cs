@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using Core.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -195,7 +194,7 @@ public class FFprobe
     public static async Task<FFprobeResult> GetFileInfos(string path)
     {
         using var compiler = new Process();
-        compiler.StartInfo.WorkingDirectory = Path.GetTempPath();  
+        compiler.StartInfo.WorkingDirectory = Path.GetTempPath();
         compiler.StartInfo.FileName = ffprobePath;
         compiler.StartInfo.Arguments = $" -v quiet -print_format json -show_format -show_streams \"{path}\"";
         compiler.StartInfo.UseShellExecute = false;
@@ -220,7 +219,7 @@ internal static class Converter
         DateParseHandling = DateParseHandling.None,
         Converters =
         {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+            new IsoDateTimeConverter {DateTimeStyles = DateTimeStyles.AssumeUniversal}
         }
     };
 }
@@ -252,7 +251,7 @@ internal class ParseStringConverter : JsonConverter
             return;
         }
 
-        var value = (long)untypedValue;
+        var value = (long) untypedValue;
         serializer.Serialize(writer, value.ToString());
     }
 }

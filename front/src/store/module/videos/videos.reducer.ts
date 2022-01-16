@@ -1,17 +1,46 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { getVideos } from "./videos.action";
+import { addVideo, convertVideo, getVideos, updateVideoConversionPercentage } from "./videos.action";
 import { VideoModel } from "../../../core/apis/backend/generated";
 
-export interface ThemeState {
+export interface VideoState {
 	videos: VideoModel[];
+	converting: Record<VideoModel["id"], { percentage: number, status: "converting" | "processing" | "finished" }>;
 }
 
-const defaultState: ThemeState = {
+const defaultState: VideoState = {
 	videos: [],
+	converting: {},
 };
 
 export const videosReducer = createReducer(defaultState, (builder) => {
-	builder.addCase(getVideos.fulfilled, (state, action) => {
-		state.videos = action.payload;
+
+	builder.addCase(updateVideoConversionPercentage, (state, { payload }) => {
+		if (payload.percentage < 100) {
+			state.converting[payload.idVideo] = {
+				percentage: payload.percentage,
+				status: "converting",
+			};
+		} else {
+			state.converting[payload.idVideo] = {
+				percentage: payload.percentage,
+				status: "processing",
+			};
+		}
 	});
+
+	builder.addCase(addVideo.fulfilled, (state, { payload }) => {
+		const others = state.videos.filter(video => video.id !== payload.id);
+		state.videos = [...others, payload];
+	});
+
+	builder.addCase(getVideos.fulfilled, (state, { payload }) => {
+		state.videos = payload;
+	});
+
+	builder.addCase(convertVideo.fulfilled, (state, { payload }) => {
+		const others = state.videos.filter(video => video.id !== payload.id);
+		state.videos = [...others, payload];
+		state.converting[payload.id].status = "finished";
+	});
+
 });

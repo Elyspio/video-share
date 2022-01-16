@@ -3,13 +3,9 @@ import { Box, Button, Divider, FormControl, Grid, Paper, TextField } from "@mui/
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { login } from "../../../store/module/authentication/authentication.action";
 import { addVideo } from "../../../store/module/videos/videos.action";
-import { useHistory } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 
 export function AddVideo() {
-	const {
-		location: { state },
-	} = useHistory<{ user: boolean; location?: string }>();
 
 	const logged = useAppSelector((s) => s.authentication.logged);
 
@@ -17,7 +13,7 @@ export function AddVideo() {
 
 	const [file, setFile] = React.useState<File | null>(null);
 	const [filename, setFilename] = React.useState("");
-	const [location, setLocation] = React.useState(state?.location ?? "/");
+	const [location, setLocation] = React.useState("/");
 
 	const create = React.useCallback(async () => {
 		if (file !== null) {

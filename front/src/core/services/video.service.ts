@@ -13,11 +13,20 @@ export class VideoService {
 	}
 
 	public async addVideo(filename: string, container: string, file: File) {
-		const response = await this.videoClient.client.addVideo(filename, container, { fileName: filename, data: file });
+		const response = await this.videoClient.client.addVideo(filename, container, file, {
+			onUploadProgress: (evt) => {
+				console.log("onUploadProgress", evt);
+			},
+		});
 		return response.data;
 	}
 
 	public async deleteVideo(idVideo: string) {
 		await this.videoClient.client.deleteVideo(idVideo);
+	}
+
+	public async convertVideo(idVideo: string) {
+		const response = await this.videoClient.client.convertVideo(idVideo);
+		return response.data;
 	}
 }

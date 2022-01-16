@@ -10,8 +10,8 @@ namespace Web.Controllers;
 [Route("videos", Name = "Video")]
 public class VideoController : ControllerBase
 {
-    private readonly IVideoService videoService;
     private readonly IConverterService converterService;
+    private readonly IVideoService videoService;
 
     public VideoController(IVideoService videoService, IConverterService converterService)
     {
@@ -26,6 +26,7 @@ public class VideoController : ControllerBase
         var files = await videoService.GetVideos();
         return Ok(files);
     }
+
     [HttpGet("{idVideo}")]
     [ProducesResponseType(typeof(VideoModel), 200)]
     public async Task<IActionResult> GetVideo(string idVideo)

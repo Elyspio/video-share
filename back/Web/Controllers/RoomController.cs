@@ -10,25 +10,26 @@ namespace Web.Controllers;
 [Route("rooms", Name = "Room")]
 public class RoomController : ControllerBase
 {
-    private readonly IRoomService RoomService;
+    private readonly IRoomService roomService;
 
     public RoomController(IRoomService RoomService)
     {
-        this.RoomService = RoomService;
+        this.roomService = RoomService;
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(List<RoomModel>), 200)]
     public async Task<IActionResult> GetRooms()
     {
-        var files = await RoomService.GetRooms();
+        var files = await roomService.GetRooms();
         return Ok(files);
     }
+
     [HttpGet("{idRoom}")]
     [ProducesResponseType(typeof(RoomModel), 200)]
     public async Task<IActionResult> GetRoom(string idRoom)
     {
-        var file = await RoomService.GetRoom(idRoom);
+        var file = await roomService.GetRoom(idRoom);
         return Ok(file);
     }
 
@@ -38,16 +39,35 @@ public class RoomController : ControllerBase
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
     public async Task<IActionResult> CreateRoom([Required] [FromBody] string idVideo)
     {
-        var data = await RoomService.CreateRoom(idVideo);
+        var data = await roomService.CreateRoom(idVideo);
         return Created($"/rooms/{data.Name}", data);
+    }
+    
+    [HttpPut("{idRoom}/state/{state}")]
+    [ProducesResponseType(typeof(void), 204)]
+    public async Task<IActionResult> UpdateRoomState([Required] string idRoom, [Required] RoomState state)
+    {
+        await roomService.UpdateState(idRoom, state);
+        return NoContent();
     }
 
 
+
+
+    [HttpPost("{idRoom}")]
+    [ProducesResponseType(typeof(void), 204)]
+    public async Task<IActionResult> SeekTime([Required] string idRoom, long time)
+    {
+        await roomService.SeekTime(idRoom, time);
+        return NoContent();
+    }
+    
+    
     [HttpDelete("{idRoom}")]
     [ProducesResponseType(typeof(void), 204)]
     public async Task<IActionResult> DeleteRoom([Required] string idRoom)
     {
-        await RoomService.DeleteRoom(idRoom);
+        await roomService.DeleteRoom(idRoom);
         return NoContent();
     }
 }

@@ -18,4 +18,19 @@ export class RoomService {
 		return response.data;
 	}
 
+	public async createRoom(idVideo: RoomModel["idVideo"]) {
+		const response = await this.roomClient.client.createRoom(idVideo);
+		return response.data;
+	}
+
+	public async deleteRoom(id: RoomModel["name"]) {
+		const response = await this.roomClient.client.createRoom(id);
+		return response.data;
+	}
+
+
+	public async updateRoomState(id: RoomModel["name"], state: RoomModel["state"]) {
+		await this.roomClient.client.updateRoomState(id, state);
+	}
+
 }

@@ -4,7 +4,8 @@ export type Config = {
 		authentication: string;
 		hubs: string
 	};
-	loginPageUrl: "http://localhost";
+	loginPageUrl: string;
+	videoUrlTemplate: string
 };
 
 declare global {

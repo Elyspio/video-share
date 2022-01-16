@@ -59,8 +59,16 @@ internal class VideoService : IVideoService
     {
         var token = await authenticationService.Login();
         var file = await videoRepository.GetVideo(idVideo);
-        await filesClient.DeleteFile2Async(file.IdFile, token, token);
-        await videoRepository.DeleteVideo(idVideo);
+
+        var tasks = new List<Task>
+        {
+            filesClient.DeleteFile2Async(file.IdFile, token, token),
+            videoRepository.DeleteVideo(idVideo)
+        };
+
+        if (file.IdConvertedFile != null) tasks.Add(filesClient.DeleteFile2Async(file.IdConvertedFile, token, token));
+
+        await Task.WhenAll(tasks);
     }
 
     public async Task<Video> GetVideo(string idVideo)
