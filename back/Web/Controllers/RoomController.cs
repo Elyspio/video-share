@@ -54,9 +54,9 @@ public class RoomController : ControllerBase
 
 
 
-    [HttpPost("{idRoom}")]
+    [HttpPut("{idRoom}/time")]
     [ProducesResponseType(typeof(void), 204)]
-    public async Task<IActionResult> SeekTime([Required] string idRoom, long time)
+    public async Task<IActionResult> SeekTime([Required] string idRoom, [FromBody] long time)
     {
         await roomService.SeekTime(idRoom, time);
         return NoContent();

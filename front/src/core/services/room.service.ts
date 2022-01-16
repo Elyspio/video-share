@@ -33,4 +33,8 @@ export class RoomService {
 		await this.roomClient.client.updateRoomState(id, state);
 	}
 
+	public async seekTime(id: RoomModel["name"], time: number) {
+		await this.roomClient.client.seekTime(id, time);
+	}
+
 }

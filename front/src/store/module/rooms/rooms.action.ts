@@ -23,8 +23,18 @@ export const deleteRoom = createAsyncThunk("rooms/deleteRoom", async (params: { 
 	await dispatch(getRooms());
 });
 
-export const updateRoomState = createAction<{ name: RoomModel["name"], state: RoomModel["state"] }>("rooms/updateRoomState");
+export const updateRoomState = createAsyncThunk("rooms/updateRoomState", async (params: { name: RoomModel["name"], state: RoomModel["state"], fromSocket?: boolean }) => {
+	if(!params.fromSocket) {
+		await roomService.updateRoomState(params.name, params.state);
+	}
+	return params;
+});
 
 
-export const seekTime = createAction<{ name: RoomModel["name"], time: number }>("rooms/seekTime");
+export const seekTime = createAsyncThunk("rooms/seekTime", async (params: { name: RoomModel["name"], time: number, fromSocket?: boolean  })=> {
+	if(!params.fromSocket) {
+		await roomService.seekTime(params.name, params.time);
+	}
+	return params;
+});
 export const setSeekingDone = createAction<RoomModel["name"]>("rooms/setSeekingDone");

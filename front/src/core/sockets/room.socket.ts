@@ -9,11 +9,13 @@ export const connection = new HubConnectionBuilder()
 	.build();
 
 connection.on("update-room-state", (idRoom: RoomModel["name"], state: RoomState) => {
-	store.dispatch(updateRoomState({ name: idRoom, state }));
+	const storeState = store.getState();
+	const room = storeState.rooms.rooms.find(room => room.name === idRoom);
+	store.dispatch(updateRoomState({ name: idRoom, state, fromSocket: true }));
 });
 
 
 connection.on("seek-time", (idRoom: RoomModel["name"], time: number) => {
-	store.dispatch(seekTime({ name: idRoom, time }));
+	store.dispatch(seekTime({ name: idRoom, time, fromSocket: true }));
 });
 

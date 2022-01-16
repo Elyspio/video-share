@@ -30,14 +30,14 @@ export const roomsReducer = createReducer(defaultState, (builder) => {
 		state.rooms = payload;
 	});
 
-	builder.addCase(updateRoomState, (state, { payload }) => {
+	builder.addCase(updateRoomState.fulfilled, (state, { payload }) => {
 		const room = state.rooms.find(room => room.name === payload.name);
 		if (room) {
 			room.state = payload.state;
 		}
 	});
 
-	builder.addCase(seekTime, (state, { payload }) => {
+	builder.addCase(seekTime.fulfilled, (state, { payload }) => {
 		if(state.rooms.some(room => room.name === payload.name)) {
 			state.seeking[payload.name] = {
 				status: "fetching",

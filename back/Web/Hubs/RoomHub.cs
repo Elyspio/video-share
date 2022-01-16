@@ -18,7 +18,7 @@ public class RoomHub : Hub, IRoomHub
         await context.Clients.All.SendAsync("update-room-state", idRoom, state);
     }
 
-    public async void SeekTime(string idRoom, long time)
+    public async Task SeekTime(string idRoom, long time)
     {
         await context.Clients.All.SendAsync("seek-time", idRoom, time);
     }

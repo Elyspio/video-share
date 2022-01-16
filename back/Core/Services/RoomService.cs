@@ -42,9 +42,9 @@ internal class RoomService : IRoomService
         await roomRepository.DeleteRoom(idRoom);
     }
 
-    public Task SeekTime(string idRoom, long time)
+    public  async Task SeekTime(string idRoom, long time)
     {
-        this.roomHub.SeekTime(idRoom, time);
+        await this.roomHub.SeekTime(idRoom, time);
     }
 
     public async Task<Room> GetRoom(string idRoom)

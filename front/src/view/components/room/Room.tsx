@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { Box, Divider, Paper, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { Link } from "react-router-dom";
 import { routes } from "../../../config/routes";
-import { seekTime, updateRoomState } from "../../../store/module/rooms/rooms.action";
+import { seekTime, setSeekingDone, updateRoomState } from "../../../store/module/rooms/rooms.action";
 import { RoomState } from "../../../core/apis/backend/generated";
 
 interface MetadataItemProps {
@@ -14,7 +14,6 @@ interface MetadataItemProps {
 
 function Metadata({ label, value }: MetadataItemProps) {
 	return <Typography>{label}: <Typography variant={"body2"} color={"gray"} component={"span"}>{value}</Typography> </Typography>;
-
 }
 
 
@@ -24,43 +23,77 @@ export function Room() {
 
 
 	const data = useAppSelector(s => s.rooms.rooms.find(room => room.name === name));
+	const seekInfo = useAppSelector(s => s.rooms.seeking[name ?? ""])
 
 
 	const [ref, setRef] = React.useState<HTMLVideoElement | null>(null);
 
-	const [seeking, setSeeking] = React.useState<{}>()
+	const [seeking, setSeeking] = React.useState<{}>();
 
 
 	const dispatch = useAppDispatch();
 
 	const callbacks = React.useMemo(() => {
 		return {
-			onPlay: () => dispatch(updateRoomState({name: data!.name, state: RoomState.Playing})),
-			onPause: () => dispatch(updateRoomState({name: data!.name, state: RoomState.Paused})),
+			onPlay: (e?: Event) => {
+				e?.preventDefault();
+				return dispatch(updateRoomState({ name: data!.name, state: RoomState.Playing }));
+			},
+			onPause: (e?: Event) => {
+				e?.preventDefault();
+				return dispatch(updateRoomState({ name: data!.name, state: RoomState.Paused }));
+			},
 			onSeek: (e) => {
-				const target = e.target.value as HTMLVideoElement
-				const time =  target.currentTime;
-				dispatch(seekTime({name: data!.name, time}))
+				const target = e.target as HTMLVideoElement;
+				const time = target.currentTime;
+
+			},
+			synchronize: async () => {
+				if(ref) {
+					await dispatch(updateRoomState({ name: data!.name, state: RoomState.Paused }));
+					await dispatch(seekTime({ name: data!.name, time: ref.currentTime }));
+					setTimeout(() => {
+						dispatch(updateRoomState({ name: data!.name, state: RoomState.Playing }));
+					}, 2500)
+				}
 			}
 
-		}
+		};
 
-	}, [dispatch, data])
+	}, [dispatch, data]);
 
 	useEffect(() => {
-		if(ref) {
-			ref.addEventListener("play", callbacks.onPlay)
-			ref.addEventListener("pause", callbacks.onPause)
-			ref.addEventListener("seeking", callbacks.onSeek)
+		if (ref) {
+			ref.addEventListener("playing", callbacks.onPlay);
+			ref.addEventListener("pause", callbacks.onPause);
+			ref.addEventListener("seeking", callbacks.onSeek);
 		}
 		return () => {
-			if(ref) {
-				ref.removeEventListener("play", callbacks.onPlay)
-				ref.removeEventListener("pause", callbacks.onPause)
-				ref.removeEventListener("seeking", callbacks.onSeek)
+			if (ref) {
+				ref.removeEventListener("play", callbacks.onPlay);
+				ref.removeEventListener("pause", callbacks.onPause);
+				ref.removeEventListener("seeking", callbacks.onSeek);
+			}
+		};
+	}, [ref, callbacks]);
+
+	React.useEffect(() => {
+		if(ref && data) {
+			const isPlaying = !ref.paused && !ref.ended && ref.currentTime > 0;
+			if(data.state === RoomState.Playing && !isPlaying) ref.play()
+			if(data.state === RoomState.Paused && isPlaying) ref.pause();
+		}
+	}, [data, ref]);
+
+
+	React.useEffect(() => {
+		if(ref && seekInfo && name) {
+			if(seekInfo.status !== "done") {
+				ref.currentTime = seekInfo.time;
+				dispatch(setSeekingDone(name))
 			}
 		}
-	}, [ref])
+	}, [dispatch, ref, seekInfo, name])
 
 	const videoUrl = React.useMemo(() => {
 		if (data) {
@@ -88,8 +121,16 @@ export function Room() {
 
 
 				<Box margin={1}>
-					<video width={"100%"} src={videoUrl} height={"100%"}  controls ref={r => setRef(r)}>
+					<video preload={"auto"} width={"100%"} src={videoUrl} height={"100%"} controls ref={r => setRef(r)}>
 					</video>
+
+
+					<Grid container>
+						<Grid item>
+							<Button onClick={callbacks.synchronize}>Synchronize</Button>
+						</Grid>
+					</Grid>
+
 				</Box>
 
 			</Paper>
