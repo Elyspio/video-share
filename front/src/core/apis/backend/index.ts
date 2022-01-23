@@ -7,7 +7,7 @@ const instance = axios.create({
 	withCredentials: true,
 });
 
-export type Newable<T> = { new(...args: ConstructorParameters<typeof BaseAPI>): T };
+export type Newable<T> = { new (...args: ConstructorParameters<typeof BaseAPI>): T };
 
 function createApi<T extends BaseAPI>(cls: Newable<T>): T {
 	return new cls(undefined, window.config.endpoints.core, instance);
@@ -22,4 +22,3 @@ export class VideoClient {
 export class RoomClient {
 	public readonly client = createApi(RoomApi);
 }
-

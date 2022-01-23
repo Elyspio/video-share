@@ -5,5 +5,5 @@ window.config = {
 		hubs: "http://localhost/hubs",
 	},
 	loginPageUrl: "http://localhost/authentication",
-	videoUrlTemplate: "http://localhost:4003/files/user/{id}/stream"
+	videoUrlTemplate: "http://localhost:4003/files/user/{id}/stream",
 };

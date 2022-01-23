@@ -27,4 +27,5 @@ export const convertVideo = createAsyncThunk("videos/convertVideo", async (param
 	return await videoService.convertVideo(params.idVideo);
 });
 
-export const updateVideoConversionPercentage = createAction<{ idVideo: VideoModel["id"], percentage: number }>("videos/updateVideoConversionPercentage");
+export const updateVideoConversionPercentage = createAction<{ idVideo: VideoModel["id"]; percentage: number }>("videos/updateVideoConversionPercentage");
+export const updateVideoUploadPercentage = createAction<number>("videos/updateVideoUploadPercentage");

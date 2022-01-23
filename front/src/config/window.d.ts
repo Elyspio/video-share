@@ -2,10 +2,10 @@ export type Config = {
 	endpoints: {
 		core: string;
 		authentication: string;
-		hubs: string
+		hubs: string;
 	};
 	loginPageUrl: string;
-	videoUrlTemplate: string
+	videoUrlTemplate: string;
 };
 
 declare global {

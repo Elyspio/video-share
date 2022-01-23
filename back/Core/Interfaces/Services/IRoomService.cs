@@ -10,5 +10,5 @@ public interface IRoomService
     Task<Room> GetRoom(string idRoom);
     Task<List<Room>> GetRooms();
     Task DeleteRoom(string idRoom);
-    Task SeekTime(string idRoom, long time);
+    Task SeekTime(string idRoom, double time);
 }

@@ -1,9 +1,10 @@
-﻿using Core.Interfaces.Services;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Web.Utils;
+using IAuthenticationService = Core.Interfaces.Services.IAuthenticationService;
 
 namespace Web.Filters;
 
@@ -32,15 +33,15 @@ public class RequireAuthAttribute : ActionFilterAttribute
 
         if (token == default)
         {
-            context.Result = new UnauthorizedResult();
-            throw new Exception("Token not found");
+            context.Result = new UnauthorizedObjectResult("Token not found");
+            return;
         }
 
 
         if (!await authenticationService.IsLogged(token))
         {
-            context.Result = new ForbidResult();
-            throw new Exception("You are not authorized for this service");
+            context.Result = new ForbidResult("https://elyspio.fr");
+            return;
         }
 
         var username = await authenticationService.GetUsername(token);

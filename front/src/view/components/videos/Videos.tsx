@@ -10,16 +10,18 @@ const Videos = () => {
 		dispatch(getVideos());
 	}, [dispatch]);
 
-	const { videos } = useAppSelector(s => s.videos);
+	const { videos } = useAppSelector((s) => s.videos);
 
 	return (
-		<Container className={"Videos"} >
+		<Container className={"Videos"}>
 			<Paper>
 				<Box p={2}>
 					<Grid container direction={"column"} spacing={2}>
-						{videos.map(video => <Grid key={video.id} item>
-							<Video data={video} />
-						</Grid>)}
+						{videos.map((video) => (
+							<Grid key={video.id} item>
+								<Video data={video} />
+							</Grid>
+						))}
 					</Grid>
 				</Box>
 			</Paper>

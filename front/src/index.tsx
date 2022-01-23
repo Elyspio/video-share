@@ -16,8 +16,7 @@ import { ReduxRouter } from "@lagunovsky/redux-react-router";
 
 declare module "@mui/styles/defaultTheme" {
 	// eslint-disable-next-line @typescript-eslint/no-empty-interface
-	interface DefaultTheme extends Theme {
-	}
+	interface DefaultTheme extends Theme {}
 }
 
 function Wrapper() {
@@ -26,7 +25,7 @@ function Wrapper() {
 	return (
 		<StyledEngineProvider injectFirst>
 			<ThemeProvider theme={theme}>
-					<Application />
+				<Application />
 				<ToastContainer position={"top-left"} />
 				<CssBaseline />
 			</ThemeProvider>
@@ -37,13 +36,13 @@ function Wrapper() {
 function App() {
 	return (
 		<React.StrictMode>
-		<DiProvider container={container}>
-			<Provider store={store}>
-				<ReduxRouter history={browserHistory} store={store} basename={process.env.NODE_ENV === "production" ? "/video-share" : "/"}>
-					<Wrapper />
-				</ReduxRouter>
-			</Provider>
-		</DiProvider>
+			<DiProvider container={container}>
+				<Provider store={store}>
+					<ReduxRouter history={browserHistory} store={store}>
+						<Wrapper />
+					</ReduxRouter>
+				</Provider>
+			</DiProvider>
 		</React.StrictMode>
 	);
 }
@@ -51,7 +50,6 @@ function App() {
 initSockets().then(() => {
 	ReactDOM.render(<App />, document.getElementById("root"));
 });
-
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -6,8 +6,8 @@ import { addVideo } from "../../../store/module/videos/videos.action";
 import Typography from "@mui/material/Typography";
 
 export function AddVideo() {
-
 	const logged = useAppSelector((s) => s.authentication.logged);
+	const uploading = useAppSelector((s) => s.videos.uploading);
 
 	const dispatch = useAppDispatch();
 
@@ -57,7 +57,6 @@ export function AddVideo() {
 					{!emptyFile && (
 						<>
 							<Grid item xs={6} container>
-
 								<FormControl fullWidth>
 									<TextField
 										size={"small"}
@@ -87,7 +86,8 @@ export function AddVideo() {
 
 							<Grid item xs={12} container justifyContent={"center"}>
 								<Button size={"large"} color={"primary"} variant={"outlined"} disabled={filename.length === 0 || emptyFile} onClick={create}>
-									Create
+									{(!uploading || uploading.status === "uploading") && `Create ${uploading ? `${uploading.percentage.toFixed(0)}%` : undefined}`}
+									{uploading?.status === "processing" && "Processing"}
 								</Button>
 							</Grid>
 						</>

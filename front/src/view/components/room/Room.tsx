@@ -1,99 +1,51 @@
-import React, { useEffect } from "react";
-import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
+import React from "react";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router";
-import { useAppDispatch, useAppSelector } from "../../../store";
+import { useAppSelector } from "../../../store";
 import { Link } from "react-router-dom";
 import { routes } from "../../../config/routes";
-import { seekTime, setSeekingDone, updateRoomState } from "../../../store/module/rooms/rooms.action";
 import { RoomState } from "../../../core/apis/backend/generated";
+import { RequireLogin } from "../utils/RequireLogin";
+import { useInjection } from "inversify-react";
+import { RoomService } from "../../../core/services/room.service";
+import { DiKeysService } from "../../../core/di/services/di.keys.service";
+import { Player, PlayerProps } from "./Player";
+import { setSeekingDone } from "../../../store/module/rooms/rooms.action";
 
 interface MetadataItemProps {
-	label: string,
-	value: string
+	label: string;
+	value: string;
 }
 
 function Metadata({ label, value }: MetadataItemProps) {
-	return <Typography>{label}: <Typography variant={"body2"} color={"gray"} component={"span"}>{value}</Typography> </Typography>;
+	return (
+		<Typography>
+			{label}:{" "}
+			<Typography variant={"body2"} color={"gray"} component={"span"}>
+				{value}
+			</Typography>{" "}
+		</Typography>
+	);
 }
 
-
 export function Room() {
-
 	const { name } = useParams();
 
+	const services = {
+		rooms: useInjection<RoomService>(DiKeysService.room),
+	};
 
-	const data = useAppSelector(s => s.rooms.rooms.find(room => room.name === name));
-	const seekInfo = useAppSelector(s => s.rooms.seeking[name ?? ""])
+	const data = useAppSelector((s) => s.rooms.rooms.find((room) => room.name === name));
+	const seekInfo = useAppSelector((s) => s.rooms.seeking);
+	const isLogged = useAppSelector((s) => s.authentication.logged);
 
+	const [currentTime, setCurrentTime] = React.useState(0);
+	const [state, setState] = React.useState<PlayerProps["state"]>("playing");
 
-	const [ref, setRef] = React.useState<HTMLVideoElement | null>(null);
-
-	const [seeking, setSeeking] = React.useState<{}>();
-
-
-	const dispatch = useAppDispatch();
-
-	const callbacks = React.useMemo(() => {
-		return {
-			onPlay: (e?: Event) => {
-				e?.preventDefault();
-				return dispatch(updateRoomState({ name: data!.name, state: RoomState.Playing }));
-			},
-			onPause: (e?: Event) => {
-				e?.preventDefault();
-				return dispatch(updateRoomState({ name: data!.name, state: RoomState.Paused }));
-			},
-			onSeek: (e) => {
-				const target = e.target as HTMLVideoElement;
-				const time = target.currentTime;
-
-			},
-			synchronize: async () => {
-				if(ref) {
-					await dispatch(updateRoomState({ name: data!.name, state: RoomState.Paused }));
-					await dispatch(seekTime({ name: data!.name, time: ref.currentTime }));
-					setTimeout(() => {
-						dispatch(updateRoomState({ name: data!.name, state: RoomState.Playing }));
-					}, 2500)
-				}
-			}
-
-		};
-
-	}, [dispatch, data]);
-
-	useEffect(() => {
-		if (ref) {
-			ref.addEventListener("playing", callbacks.onPlay);
-			ref.addEventListener("pause", callbacks.onPause);
-			ref.addEventListener("seeking", callbacks.onSeek);
-		}
-		return () => {
-			if (ref) {
-				ref.removeEventListener("play", callbacks.onPlay);
-				ref.removeEventListener("pause", callbacks.onPause);
-				ref.removeEventListener("seeking", callbacks.onSeek);
-			}
-		};
-	}, [ref, callbacks]);
-
-	React.useEffect(() => {
-		if(ref && data) {
-			const isPlaying = !ref.paused && !ref.ended && ref.currentTime > 0;
-			if(data.state === RoomState.Playing && !isPlaying) ref.play()
-			if(data.state === RoomState.Paused && isPlaying) ref.pause();
-		}
-	}, [data, ref]);
-
-
-	React.useEffect(() => {
-		if(ref && seekInfo && name) {
-			if(seekInfo.status !== "done") {
-				ref.currentTime = seekInfo.time;
-				dispatch(setSeekingDone(name))
-			}
-		}
-	}, [dispatch, ref, seekInfo, name])
+	// const seeking = React.useMemo(() => {
+	// 	if (!seekInfo) return false;
+	// 	return seekInfo.status !== "done";
+	// }, [seekInfo]);
 
 	const videoUrl = React.useMemo(() => {
 		if (data) {
@@ -101,6 +53,54 @@ export function Room() {
 		}
 		return "";
 	}, [data]);
+
+	const callbacks = React.useMemo(() => {
+		return {
+			onPlay: async () => {
+				await services.rooms.updateRoomState(data!.name, RoomState.Playing);
+			},
+			onPause: async () => {
+				await services.rooms.updateRoomState(data!.name, RoomState.Paused);
+			},
+			onSeek: async (time: number) => {
+				await services.rooms.seekTime(data!.name, time);
+			},
+		};
+	}, [data, services.rooms]);
+
+	React.useEffect(() => {
+		let timeout: NodeJS.Timeout;
+		if (seekInfo) {
+			if (seekInfo.status === "fetching") {
+				setState("pause");
+				setCurrentTime(seekInfo.time);
+				const diff = new Date(seekInfo.synchro).getTime() - Date.now();
+				timeout = setTimeout(() => {
+					setState("playing");
+					setSeekingDone(data!.name);
+				}, diff);
+			}
+		}
+		return () => {
+			if (timeout) clearTimeout(timeout);
+		};
+	}, [data, seekInfo]);
+
+	React.useEffect(() => {
+		if (data) {
+			console.log("room", state, data.state);
+			if (state === "playing" && data.state === RoomState.Paused) {
+				console.log("room pause");
+				setState("pause");
+			}
+			if (state === "pause" && data.state === RoomState.Playing) {
+				console.log("room playing");
+				setState("playing");
+			}
+		}
+	}, [data, state]);
+
+	if (!isLogged) return <RequireLogin route={window.location.pathname} />;
 
 	if (!name) return <RoomNotProvided />;
 
@@ -117,43 +117,33 @@ export function Room() {
 				<Metadata label={"State"} value={data.state} />
 			</Paper>
 
-			<Paper>
-
-
-				<Box margin={1}>
-					<video preload={"auto"} width={"100%"} src={videoUrl} height={"100%"} controls ref={r => setRef(r)}>
-					</video>
-
-
-					<Grid container>
-						<Grid item>
-							<Button onClick={callbacks.synchronize}>Synchronize</Button>
-						</Grid>
-					</Grid>
-
-				</Box>
-
-			</Paper>
-
+			<Player state={state} currentTime={currentTime} onPause={callbacks.onPause} onPlay={callbacks.onPlay} onSeek={callbacks.onSeek} src={videoUrl} />
 		</Box>
 	);
 }
-
 
 interface RoomNotFoundProps {
 	name: string;
 }
 
 function RoomNotFound({ name }: RoomNotFoundProps) {
-	return <Box>
-		<Typography>Could not find a room with id {name}</Typography>
-		<Link to={routes.rooms}>See other rooms</Link>
-	</Box>;
+	return (
+		<Box>
+			<Typography>Could not find a room with id {name}</Typography>
+			<Button color={"inherit"}>
+				<Link to={routes.rooms}>See other rooms</Link>
+			</Button>
+		</Box>
+	);
 }
 
 function RoomNotProvided() {
-	return <Box>
-		<Typography>You must provide a room name</Typography>
-		<Link to={routes.rooms}>See other rooms</Link>
-	</Box>;
+	return (
+		<Box>
+			<Typography>You must provide a room name</Typography>
+			<Button color={"inherit"}>
+				<Link to={routes.rooms}>See other rooms</Link>
+			</Button>
+		</Box>
+	);
 }

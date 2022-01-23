@@ -40,7 +40,7 @@ export function useAsyncCallback<T extends (...args: any[]) => Promise<any>>(cal
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		},
-		[...deps, setIsExecuting, setError, callback],
+		[...deps, setIsExecuting, setError, callback]
 	) as T;
 
 	return [wrappedCallback, { isExecuting, error, successfullyExecuted: success }];

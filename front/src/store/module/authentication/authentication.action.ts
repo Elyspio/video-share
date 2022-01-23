@@ -45,13 +45,13 @@ function waitForLogin(page: Window) {
 export const login = createAsyncThunk("authentication/login", async (_, { getState, dispatch }) => {
 	const { logged, username, settings } = (getState() as StoreState).authentication;
 	if (!logged || username === undefined) {
-		const toastId = toast.info("Connecting", { autoClose: false });
+		const idToast = toast.info("Connecting", { autoClose: false });
 		const page = authentication.openLoginPage();
 		if (page != null) {
 			await waitForLogin(page);
 			page.close();
-			dispatch(getUserInfos());
-			toast.update(toastId, {
+			await dispatch(getUserInfos());
+			toast.update(idToast, {
 				render: "Connected",
 				autoClose: 5000,
 				type: "success",
@@ -69,7 +69,9 @@ export const silentLogin = createAsyncThunk("authentication/silentLogin", async 
 	const { logged, username, settings } = (getState() as StoreState).authentication;
 	if (!logged || username === undefined) {
 		if (await authentication.isLogged()) {
-			dispatch(getUserInfos());
+			return await dispatch(getUserInfos());
+		} else {
+			return false;
 		}
 	} else {
 		console.info("You are already logged");

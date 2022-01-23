@@ -2,7 +2,7 @@
 	"name": "front",
 	"version": "0.1.0",
 	"private": true,
-	"homepage": "/",
+	"homepage": "/video-share/",
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
@@ -29,7 +29,8 @@
 		"react-toastify": "^8.1.0",
 		"redux": "4.1.2",
 		"history": "^5.2.0",
-		"reflect-metadata": "^0.1.13"
+		"reflect-metadata": "^0.1.13",
+		"mini-css-extract-plugin": "2.4.5"
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.8",

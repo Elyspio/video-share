@@ -2,9 +2,9 @@
 
 public class AuthUtility
 {
-    public static readonly string UsernameField = "auth_username";
+    public const string UsernameField = "auth_username";
 
-    public static readonly string TokenField = "auth_token";
+    public const string TokenField = "auth_token";
 
     public static string GetUsername(HttpRequest request)
     {

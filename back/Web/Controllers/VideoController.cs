@@ -2,12 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Web.Filters;
 using Web.Models;
 
 namespace Web.Controllers;
 
 [ApiController]
 [Route("videos", Name = "Video")]
+[RequireAuth]
 public class VideoController : ControllerBase
 {
     private readonly IConverterService converterService;

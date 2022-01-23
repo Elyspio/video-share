@@ -28,7 +28,6 @@ export class RoomService {
 		return response.data;
 	}
 
-
 	public async updateRoomState(id: RoomModel["name"], state: RoomModel["state"]) {
 		await this.roomClient.client.updateRoomState(id, state);
 	}
@@ -36,5 +35,4 @@ export class RoomService {
 	public async seekTime(id: RoomModel["name"], time: number) {
 		await this.roomClient.client.seekTime(id, time);
 	}
-
 }

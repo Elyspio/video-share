@@ -14,8 +14,10 @@ export class VideoService {
 
 	public async addVideo(filename: string, container: string, file: File) {
 		const response = await this.videoClient.client.addVideo(filename, container, file, {
-			onUploadProgress: (evt) => {
-				console.log("onUploadProgress", evt);
+			onUploadProgress: async (evt: ProgressEvent) => {
+				const store = (await import("../../store")).default;
+				const { updateVideoUploadPercentage } = await import("../../store/module/videos/videos.action");
+				store.dispatch(updateVideoUploadPercentage((evt.loaded / evt.total) * 100));
 			},
 		});
 		return response.data;

@@ -72,7 +72,6 @@ var useBuilder = () =>
             o.Conventions.Add(new ControllerDocumentationConvention());
             o.OutputFormatters.RemoveType<StringOutputFormatter>();
         })
-        .AddNewtonsoftJson()
         .AddJsonOptions(x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
