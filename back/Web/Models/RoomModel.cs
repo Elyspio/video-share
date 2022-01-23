@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Core.Enums;
 
 namespace Web.Models;
 
@@ -13,8 +13,8 @@ public class RoomModel
     [NotNull]
     public string Name { get; set; }
 
-    [Required] [NotNull] public string FileName { get; set; }
-    [Required] [NotNull] public string IdVideo { get; set; }
-    [Required] [NotNull] public string Location { get; set; }
+    [Required][NotNull] public string FileName { get; set; }
+    [Required][NotNull] public string IdVideo { get; set; }
+    [Required][NotNull] public string Location { get; set; }
     [Required] public RoomState State { get; set; }
 }

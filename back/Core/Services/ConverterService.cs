@@ -2,6 +2,7 @@
 using Core.Enums;
 using Core.Interfaces.Hubs;
 using Core.Interfaces.Services;
+using Core.Interfaces.Utils;
 
 namespace Core.Services;
 
@@ -9,17 +10,18 @@ internal class ConverterService : IConverterService
 {
     private readonly IAuthenticationService authenticationService;
     private readonly IConversionHub conversionHub;
-
+    private readonly IAuthContext authContext;
     private readonly IUserFilesClient filesClient;
     private readonly IVideoService videoService;
 
     public ConverterService(IUserFilesClient filesClient, IVideoService videoService,
-        IAuthenticationService authenticationService, IConversionHub conversionHub)
+        IAuthenticationService authenticationService, IConversionHub conversionHub, IAuthContext authContext)
     {
         this.filesClient = filesClient;
         this.videoService = videoService;
         this.authenticationService = authenticationService;
         this.conversionHub = conversionHub;
+        this.authContext = authContext;
     }
 
     public async Task<string> Convert(string idVideo, VideoFormat format)
@@ -45,8 +47,7 @@ internal class ConverterService : IConverterService
             var data = await ffmpeg.Convert();
             await conversionHub.UpdateConversionProgression(idVideo, 100);
 
-            var token = await authenticationService.Login();
-            var rawFileMetadata = await filesClient.GetFile2Async(video.IdFile, token, token);
+            var rawFileMetadata = await filesClient.GetFile2Async(video.IdFile, authContext.Token, authContext.Token);
 
 
             var container = rawFileMetadata.Location[..rawFileMetadata.Location.LastIndexOf("/")];
@@ -58,8 +59,8 @@ internal class ConverterService : IConverterService
             using (var stream = new MemoryStream(data))
             {
                 var created = await filesClient.AddFile2Async(
-                    token,
-                    token,
+                    authContext.Token,
+                    authContext.Token,
                     createdFilename,
                     $"{container}/converted",
                     new FileParameter(stream, createdFilename, "video/mp4")

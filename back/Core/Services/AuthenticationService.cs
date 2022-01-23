@@ -1,8 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Adapters.Authentication;
+﻿using Adapters.Authentication;
 using Core.Interfaces.Services;
 using Core.Utils;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Core.Services;
 

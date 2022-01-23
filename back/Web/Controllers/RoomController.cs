@@ -1,13 +1,16 @@
-using System.ComponentModel.DataAnnotations;
 using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using Web.Filters;
 using Web.Models;
 
 namespace Web.Controllers;
 
 [ApiController]
 [Route("rooms", Name = "Room")]
+[RequireAuth]
+
 public class RoomController : ControllerBase
 {
     private readonly IRoomService roomService;
@@ -37,12 +40,12 @@ public class RoomController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(RoomModel), 201)]
     [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
-    public async Task<IActionResult> CreateRoom([Required] [FromBody] string idVideo)
+    public async Task<IActionResult> CreateRoom([Required][FromBody] string idVideo)
     {
         var data = await roomService.CreateRoom(idVideo);
         return Created($"/rooms/{data.Name}", data);
     }
-    
+
     [HttpPut("{idRoom}/state/{state}")]
     [ProducesResponseType(typeof(void), 204)]
     public async Task<IActionResult> UpdateRoomState([Required] string idRoom, [Required] RoomState state)
@@ -61,8 +64,8 @@ public class RoomController : ControllerBase
         await roomService.SeekTime(idRoom, time);
         return NoContent();
     }
-    
-    
+
+
     [HttpDelete("{idRoom}")]
     [ProducesResponseType(typeof(void), 204)]
     public async Task<IActionResult> DeleteRoom([Required] string idRoom)

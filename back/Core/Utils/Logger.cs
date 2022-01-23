@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using Serilog;
+﻿using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Core.Utils;
 

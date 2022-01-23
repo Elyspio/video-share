@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using Core.Utils;
+﻿using Core.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Core.Services.FFmpeg;
 
@@ -251,7 +251,7 @@ internal class ParseStringConverter : JsonConverter
             return;
         }
 
-        var value = (long) untypedValue;
+        var value = (long)untypedValue;
         serializer.Serialize(writer, value.ToString());
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Core.Enums;
+﻿using Core.Enums;
 using Core.Utils;
+using System.Diagnostics;
+using System.Text;
 
 namespace Core.Services.FFmpeg;
 
@@ -67,7 +67,7 @@ public class FFmpeg
             if (e.Data!.Contains("frame="))
             {
                 var currentFrame = GetCurrentFrame(e.Data);
-                var percentage = currentFrame / (double) nbFrames * 100;
+                var percentage = currentFrame / (double)nbFrames * 100;
 
                 if (percentage > 100) percentage = 100;
 
@@ -92,10 +92,10 @@ public class FFmpeg
         var properties = await FFprobe.GetFileInfos(input);
         var stream = properties.Streams.Find(stream => stream.CodecType == "video")!;
         var parts = stream.AvgFrameRate.Split("/");
-        var framerate = (long) Math.Round(double.Parse(parts[0]) / double.Parse(parts[1]));
+        var framerate = (long)Math.Round(double.Parse(parts[0]) / double.Parse(parts[1]));
 
         var replace = properties.Format.Duration.Replace(".", ",");
-        return (long) Math.Round(framerate * double.Parse(replace));
+        return (long)Math.Round(framerate * double.Parse(replace));
     }
 
 

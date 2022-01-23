@@ -1,4 +1,6 @@
-﻿namespace Web.Utils;
+﻿using Core.Interfaces.Utils;
+
+namespace Web.Utils;
 
 public class AuthUtility
 {
@@ -14,5 +16,11 @@ public class AuthUtility
     public static string GetToken(HttpRequest request)
     {
         return request.Headers[TokenField].First();
+    }
+
+    public static void FillContext(IAuthContext context, HttpRequest request)
+    {
+        context.Token = GetToken(request);
+        context.Username = GetUsername(request);
     }
 }

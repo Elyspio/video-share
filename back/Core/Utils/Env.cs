@@ -9,6 +9,6 @@ public class Env
         var env = Environment.GetEnvironmentVariable(variableName);
         if (env == null) return fallback;
         var converter = TypeDescriptor.GetConverter(typeof(T));
-        return (T) converter.ConvertFromString(env)!;
+        return (T)converter.ConvertFromString(env)!;
     }
 }

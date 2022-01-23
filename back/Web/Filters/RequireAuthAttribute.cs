@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Core.Interfaces.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.OpenApi.Models;
@@ -19,6 +19,8 @@ public class RequireAuthAttribute : ActionFilterAttribute
         ActionExecutionDelegate next)
     {
         var authenticationService = context.HttpContext.RequestServices.GetService<IAuthenticationService>();
+        var authContext = context.HttpContext.RequestServices.GetService<IAuthContext>();
+
 
         if (authenticationService == default)
         {
@@ -47,6 +49,8 @@ public class RequireAuthAttribute : ActionFilterAttribute
         var username = await authenticationService.GetUsername(token);
         context.HttpContext.Request.Headers[AuthUtility.UsernameField] = username;
         context.HttpContext.Request.Headers[AuthUtility.TokenField] = token;
+        authContext.Username = username;
+        authContext.Token = token;
         await next();
     }
 
@@ -93,8 +97,8 @@ public class RequireAuthAttribute : ActionFilterAttribute
                 }
             });
 
-            operation.Responses.Add("401", new OpenApiResponse {Description = "Unauthorized"});
-            operation.Responses.Add("403", new OpenApiResponse {Description = "Forbidden"});
+            operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
+            operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
         }
     }
 }

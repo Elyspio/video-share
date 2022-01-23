@@ -1,11 +1,12 @@
-using System.Net;
-using System.Text.Json.Serialization;
 using Adapters;
+using Core.Interfaces.Utils;
 using Core.Utils;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Net;
+using System.Text.Json.Serialization;
 using Web.Filters;
 using Web.Hubs;
 using Web.Utils;
@@ -52,7 +53,10 @@ var useBuilder = () =>
             "Web.Hubs"
         ))
         .AsImplementedInterfaces()
-        .WithSingletonLifetime());
+        .WithScopedLifetime());
+
+
+    builder.Services.AddScoped<IAuthContext, AuthContext>();
 
     // Setup Logging
     builder.Host.UseSerilog((_, lc) => lc
@@ -136,7 +140,7 @@ var useApp = (WebApplication application) =>
         //});
         application.UseDefaultFiles(new DefaultFilesOptions
         {
-            DefaultFileNames = new List<string> {"index.html"}
+            DefaultFileNames = new List<string> { "index.html" }
         });
         application.UseStaticFiles();
     }
