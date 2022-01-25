@@ -29,19 +29,14 @@ var useBuilder = () =>
         options.AddPolicy("Cors", b =>
         {
             b.AllowCredentials();
-            b.SetIsOriginAllowed(origin => origin.Contains("localhost"));
+            b.SetIsOriginAllowed(origin => origin.Contains("localhost") || origin.Contains("elyspio.fr"));
             b.AllowAnyHeader();
             b.AllowAnyMethod();
         });
     });
 
-
     // Add Apis Adapters
     builder.Services.AddAdapters(builder.Configuration);
-
-
-    //builder.Services.AddSingleton<IConversionHub, ConversionHub>();
-    //builder.Services.AddSingleton<IPlayerHub, PlayerHub>();
 
     // Inject Services
     builder.Services.Scan(scan => scan
@@ -54,7 +49,6 @@ var useBuilder = () =>
         ))
         .AsImplementedInterfaces()
         .WithScopedLifetime());
-
 
     builder.Services.AddScoped<IAuthContext, AuthContext>();
 
@@ -127,17 +121,12 @@ var useApp = (WebApplication application) =>
 
 
     // Setup Controllers
-    application.MapControllers();
+    application.MapControllerRoute("default", "/api/{controller}/{action}");
 
 
     // Start SPA serving
     if (application.Environment.IsProduction())
     {
-        //app.UseSpa(spa =>
-        //{
-        //    spa.Options.SourcePath = frontPath;
-
-        //});
         application.UseDefaultFiles(new DefaultFilesOptions
         {
             DefaultFileNames = new List<string> { "index.html" }

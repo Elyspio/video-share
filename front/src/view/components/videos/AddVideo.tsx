@@ -86,7 +86,7 @@ export function AddVideo() {
 
 							<Grid item xs={12} container justifyContent={"center"}>
 								<Button size={"large"} color={"primary"} variant={"outlined"} disabled={filename.length === 0 || emptyFile} onClick={create}>
-									{(!uploading || uploading.status === "uploading") && `Create ${uploading ? `${uploading.percentage.toFixed(0)}%` : undefined}`}
+									{(!uploading || uploading.status === "uploading") && `Create ${uploading ? `${uploading.percentage.toFixed(0)}%` : ""}`}
 									{uploading?.status === "processing" && "Processing"}
 								</Button>
 							</Grid>

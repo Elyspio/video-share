@@ -8,7 +8,7 @@ using Web.Models;
 namespace Web.Controllers;
 
 [ApiController]
-[Route("rooms", Name = "Room")]
+[Route("api/rooms", Name = "Room")]
 [RequireAuth]
 
 public class RoomController : ControllerBase
@@ -57,9 +57,9 @@ public class RoomController : ControllerBase
 
 
 
-    [HttpPut("{idRoom}/time")]
+    [HttpPut("{idRoom}/time/{time:double}")]
     [ProducesResponseType(typeof(void), 204)]
-    public async Task<IActionResult> SeekTime([Required] string idRoom, [FromBody] double time)
+    public async Task<IActionResult> SeekTime([Required] string idRoom, [Required] double time)
     {
         await roomService.SeekTime(idRoom, time);
         return NoContent();

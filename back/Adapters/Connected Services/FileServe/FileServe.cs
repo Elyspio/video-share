@@ -130,7 +130,7 @@ namespace Adapters.FileServe
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<FileModel>> GetFilesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public");
+            urlBuilder_.Append("api/files/public");
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -204,7 +204,7 @@ namespace Adapters.FileServe
         public async System.Threading.Tasks.Task<FileModel> AddFileAsync(string? filename, string? location, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public");
+            urlBuilder_.Append("api/files/public");
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -307,7 +307,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public/{id}/binary");
+            urlBuilder_.Append("api/files/public/{id}/binary");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -383,7 +383,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public/{id}/string");
+            urlBuilder_.Append("api/files/public/{id}/string");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -458,7 +458,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public/{id}/stream");
+            urlBuilder_.Append("api/files/public/{id}/stream");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -490,6 +490,11 @@ namespace Adapters.FileServe
                         ProcessResponse(client_, response_);
     
                         var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
                         if (status_ == 206)
                         {
                             return;
@@ -530,7 +535,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public/{id}");
+            urlBuilder_.Append("api/files/public/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -612,7 +617,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/public/{id}");
+            urlBuilder_.Append("api/files/public/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -925,7 +930,7 @@ namespace Adapters.FileServe
         public async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<FileModel>> GetFiles2Async(string? authentication_tokenHeader, string? authentication_tokenCookie, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user");
+            urlBuilder_.Append("api/files/user");
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1017,7 +1022,7 @@ namespace Adapters.FileServe
         public async System.Threading.Tasks.Task<FileModel> AddFile2Async(string? authentication_tokenHeader, string? authentication_tokenCookie, string? filename, string? location, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user");
+            urlBuilder_.Append("api/files/user");
     
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1138,7 +1143,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user/{id}/binary");
+            urlBuilder_.Append("api/files/user/{id}/binary");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1232,7 +1237,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user/{id}/string");
+            urlBuilder_.Append("api/files/user/{id}/string");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1325,7 +1330,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user/{id}/stream");
+            urlBuilder_.Append("api/files/user/{id}/stream");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1359,6 +1364,11 @@ namespace Adapters.FileServe
                         ProcessResponse(client_, response_);
     
                         var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
                         if (status_ == 206)
                         {
                             return;
@@ -1415,7 +1425,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user/{id}");
+            urlBuilder_.Append("api/files/user/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1511,7 +1521,7 @@ namespace Adapters.FileServe
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("files/user/{id}");
+            urlBuilder_.Append("api/files/user/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;

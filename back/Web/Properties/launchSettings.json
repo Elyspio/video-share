@@ -1,15 +1,15 @@
 {
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    "Web": {
-      "commandName": "Project",
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "FILESERVE_PASSWORD": "azerty123",
-        "FILESERVE_USERNAME": "video-share"
-      },
-      "dtnetRunMessages": true
-    }
-  }
+	"$schema": "https://json.schemastore.org/launchsettings.json",
+	"profiles": {
+		"Web": {
+			"commandName": "Project",
+			"launchUrl": "swagger",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"FILESERVE_PASSWORD": "azerty123",
+				"FILESERVE_USERNAME": "video-share"
+			},
+			"dtnetRunMessages": true
+		}
+	}
 }

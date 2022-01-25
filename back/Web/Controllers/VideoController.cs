@@ -10,7 +10,7 @@ using Web.Utils;
 namespace Web.Controllers;
 
 [ApiController]
-[Route("videos", Name = "Video")]
+[Route("api/videos", Name = "Video")]
 [RequireAuth]
 public class VideoController : ControllerBase
 {
