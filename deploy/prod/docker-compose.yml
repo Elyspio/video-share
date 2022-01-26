@@ -9,9 +9,9 @@ services:
         labels:
             - "traefik.enable=true"
             - "traefik.docker.network=external"
-            - "traefik.http.middlewares.video-share-prefix.stripprefix.prefixes=/video-share"
+            - "traefik.http.middlewares.video-share-prefix.stripprefix.prefixes=/videos"
             - "traefik.http.routers.video-share.middlewares=video-share-prefix@docker"
-            - "traefik.http.routers.video-share.rule=PathPrefix(`/video-share`)"
+            - "traefik.http.routers.video-share.rule=PathPrefix(`/videos`)"
             - "traefik.http.services.video-share.loadbalancer.server.port=4000"
             - "traefik.http.routers.video-share.entrypoints=external"
         volumes:
@@ -21,12 +21,24 @@ services:
             FILESERVE_USERNAME: ${AUTH_USERNAME}
             FILESERVE_PASSWORD: ${AUTH_PASSWORD}
             AUTHENTICATION_SERVER_URI: "https://elyspio.fr/authentication/"
+            FFMPEG_PATH: ffmpeg
+            FFPROBE_PATH: ffprobe
         networks:
             - video-share
             - external
-            - authentication
-            - file-serve
-
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        -   driver: nvidia
+                            count: 1
+                            capabilities: [ gpu ]
+        devices:
+            - /dev/nvidia0:/dev/nvidia0
+            - /dev/nvidiactl:/dev/nvidiactl
+            - /dev/nvidia-modeset:/dev/nvidia-modeset
+            - /dev/nvidia-uvm:/dev/nvidia-uvm
+            - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
 
     video-share-db:
         container_name: video-share-db
@@ -48,9 +60,5 @@ networks:
     video-share:
         name: "video-share"
     external:
-        external: true
-    authentication:
-        external: true
-    file-serve:
         external: true
 

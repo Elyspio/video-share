@@ -4,8 +4,9 @@ import { Box, Button, Grid } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { convertVideo, deleteVideo } from "../../../store/module/videos/videos.action";
-import { createRoom } from "../../../store/module/rooms/rooms.action";
+import { createRoom, getRooms } from "../../../store/module/rooms/rooms.action";
 import { Link } from "react-router-dom";
+import { getRoute } from "../../../config/routes";
 
 interface VideoProps {
 	data: VideoModel;
@@ -44,7 +45,7 @@ export function Video({ data }: VideoProps) {
 				<Grid container spacing={2}>
 					<Grid item>
 						{room ? (
-							<Link to={`/rooms/${room.name}`}>
+							<Link to={getRoute(`/rooms/${room.name}`)}>
 								<Button variant={"outlined"}>Watch</Button>
 							</Link>
 						) : data.idConvertedFile ? (
