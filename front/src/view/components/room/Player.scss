@@ -1,0 +1,9 @@
+.Player {
+	video::-webkit-media-controls {
+		display:none !important;
+	}
+
+	.Volume {
+		transition: min-width ease-in-out 1s;
+	}
+}

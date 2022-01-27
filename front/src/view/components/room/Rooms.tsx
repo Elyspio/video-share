@@ -15,7 +15,7 @@ export function Rooms() {
 					<Paper sx={{ width: "100%", p: 2 }}>
 						<Box display={"flex"} alignItems={"center"} width={"100%"} justifyContent={"space-between"}>
 							<Typography>Filename: {room.fileName}</Typography>
-							<Link to={getRoute(`/${room.name}`)}>
+							<Link to={getRoute(`/rooms/${room.name}`)}>
 								<Button variant={"outlined"}>Watch</Button>
 							</Link>
 						</Box>

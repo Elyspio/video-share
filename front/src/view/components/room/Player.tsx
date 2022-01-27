@@ -1,7 +1,8 @@
 import React, { ReactNode, useRef } from "react";
-import { Box, Fade, Grid, Paper, Slider, Stack, Typography } from "@mui/material";
+import { Box, Button, Collapse, Fade, Grid, Paper, Slider, Stack, Typography } from "@mui/material";
 import { RoomState } from "../../../store/module/rooms/rooms.reducer";
-import { Pause, PlayArrow, Sync, VolumeDownRounded, VolumeUpRounded } from "@mui/icons-material";
+import { Fullscreen, FullscreenExit, Pause, PlayArrow, Sync, VolumeDown, VolumeDownRounded, VolumeMute, VolumeUp, VolumeUpRounded } from "@mui/icons-material";
+import IconButton from "@mui/material/IconButton";
 
 export type PlayerState = "playing" | "pause";
 
@@ -17,17 +18,12 @@ export interface PlayerProps {
 	seekTimeInfo?: RoomState["seeking"];
 }
 
-class IconButton extends React.Component<{ onClick: (e?: React.MouseEvent) => void; size: string; children: ReactNode }> {
-	render() {
-		return null;
-	}
-}
-
 export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekTimeInfo }: PlayerProps) {
 	const ref = useRef<HTMLVideoElement>(null);
 
 	const [position, setPosition] = React.useState(currentTime);
 	const [volume, setVolume] = React.useState(0);
+	const [fullscreen, setFullScreen] = React.useState(false);
 
 	const isPlaying = ref.current && !ref.current.paused && !ref.current.ended && ref.current.currentTime > 0;
 	const loading = ref.current?.readyState !== 4;
@@ -97,12 +93,23 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 		[ref]
 	);
 
+	const toggleFullScreen = React.useCallback(() => {
+		setFullScreen((prev) => {
+			if (prev) {
+				document.exitFullscreen();
+			} else {
+				ref.current?.parentElement?.requestFullscreen();
+			}
+			return !prev;
+		});
+	}, []);
+
 	console.log({ isPlaying, loading });
 
 	return (
-		<Paper>
+		<Paper className={"Player"}>
 			<Box m={1} py={1}>
-				<Box style={{ position: "relative" }}>
+				<Box style={{ position: fullscreen ? "inherit" : "relative" }}>
 					<video
 						muted={volume === 0}
 						width={"100%"}
@@ -134,24 +141,21 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 										</Grid>
 
 										<Grid item>
-											<Stack spacing={2} direction="row" sx={{ mb: 1, px: 1 }} alignItems="center">
-												{!isPlaying ? <PlayArrow onClick={playPause} /> : <Pause onClick={playPause} />}
+											<Stack spacing={2} direction="row" sx={{ mb: 1, px: 1, zIndex: 10 }} alignItems="center">
+												<IconButton size={"small"} onClick={playPause}>
+													{!isPlaying ? <PlayArrow /> : <Pause />}
+												</IconButton>
 												<Sync onClick={callbacks.synchronize}>Synchronize</Sync>
-												<VolumeDownRounded />
-												<Slider
-													value={volume}
-													size={"small"}
-													max={1}
-													min={0}
-													sx={{ width: "10rem" }}
-													step={0.05}
-													onChange={(_, val) => onVolumeChange(val as number)}
-													aria-label="Volume"
-													defaultValue={30}
-												/>
-												<VolumeUpRounded />
+
+												<Volume onChange={onVolumeChange} value={volume} />
 
 												<Time current={ref.current.currentTime} duration={ref.current.duration} />
+												<div style={{ marginRight: "auto" }} />
+												<Stack direction={"row"} justifyContent={"flex-end"}>
+													<IconButton size={"small"} onClick={toggleFullScreen}>
+														{fullscreen ? <FullscreenExit /> : <Fullscreen />}
+													</IconButton>
+												</Stack>
 											</Stack>
 										</Grid>
 									</Grid>
@@ -168,7 +172,16 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 function parseTime(time: number) {
 	const mn = Math.floor(time / 60);
 	const ss = time % 60;
-	return `${mn}:${ss}`;
+
+	let str = "";
+	if (mn < 10) str += "0";
+	str += mn.toFixed(0);
+	str += ":";
+
+	if (ss < 10) str += "0";
+	str += ss.toFixed(0);
+
+	return str;
 }
 
 interface TimeProps {
@@ -179,7 +192,39 @@ interface TimeProps {
 function Time({ duration, current }: TimeProps) {
 	return (
 		<Typography>
-			{parseTime(current)}:{parseTime(duration)}
+			{parseTime(current)} / {parseTime(duration)}
 		</Typography>
+	);
+}
+
+interface VolumeProps {
+	onChange: (val: number) => void;
+	value: number;
+}
+
+function Volume({ onChange, value }: VolumeProps) {
+	const [show, setShow] = React.useState(false);
+
+	return (
+		<Stack onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)} direction={"row"} spacing={1} className={"Volume"}>
+			<IconButton onClick={() => onChange(0)} size={"small"}>
+				{value === 0 ? <VolumeMute /> : value < 0.5 ? <VolumeDown /> : <VolumeUp />}
+			</IconButton>
+			<Collapse in={show} orientation={"horizontal"} timeout={500}>
+				<Box display={"flex"} alignItems={"center"} height={"100%"}>
+					<Slider
+						color={"secondary"}
+						value={value}
+						size={"small"}
+						max={1}
+						min={0}
+						sx={{ width: "10rem", mx: 1 }}
+						step={0.05}
+						onChange={(_, val) => onChange(val as number)}
+						aria-label="Volume"
+					/>
+				</Box>
+			</Collapse>
+		</Stack>
 	);
 }
