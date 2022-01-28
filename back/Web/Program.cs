@@ -112,13 +112,22 @@ var useApp = (WebApplication application) =>
     application.UseCors("Cors");
 
     // Setup Hubs
-    app.UseRouting();
-    app.UseEndpoints(endpoints =>
+    application.UseRouting();
+    application.UseEndpoints(endpoints =>
     {
         endpoints.MapHub<ConversionHub>("/hubs/conversion");
         endpoints.MapHub<RoomHub>("/hubs/room");
     });
 
+    application.Use(async (context, next) =>
+    {
+        await next();
+        if (context.Response.StatusCode == 404 && !context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Request.Path = "/";
+            await next();
+        }
+    });
 
     // Setup Controllers
     application.MapControllerRoute("default", "/api/{controller}/{action}");

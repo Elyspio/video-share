@@ -4,7 +4,7 @@ import { Box, Button, Grid } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { convertVideo, deleteVideo } from "../../../store/module/videos/videos.action";
-import { createRoom, getRooms } from "../../../store/module/rooms/rooms.action";
+import { createRoom } from "../../../store/module/rooms/rooms.action";
 import { Link } from "react-router-dom";
 import { getRoute } from "../../../config/routes";
 

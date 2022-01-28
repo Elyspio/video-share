@@ -12,6 +12,7 @@ import { DiKeysService } from "../../../core/di/services/di.keys.service";
 import { Player, PlayerProps } from "./Player";
 import { setSeekingDone } from "../../../store/module/rooms/rooms.action";
 import "./Player.scss";
+
 interface MetadataItemProps {
 	label: string;
 	value: string;

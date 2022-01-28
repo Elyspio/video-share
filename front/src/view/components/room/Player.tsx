@@ -1,7 +1,7 @@
-import React, { ReactNode, useRef } from "react";
-import { Box, Button, Collapse, Fade, Grid, Paper, Slider, Stack, Typography } from "@mui/material";
+import React, { useRef } from "react";
+import { Box, Collapse, Fade, Grid, Paper, Slider, Stack, Typography } from "@mui/material";
 import { RoomState } from "../../../store/module/rooms/rooms.reducer";
-import { Fullscreen, FullscreenExit, Pause, PlayArrow, Sync, VolumeDown, VolumeDownRounded, VolumeMute, VolumeUp, VolumeUpRounded } from "@mui/icons-material";
+import { Fullscreen, FullscreenExit, Pause, PlayArrow, Sync, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 
 export type PlayerState = "playing" | "pause";
@@ -104,8 +104,6 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 		});
 	}, []);
 
-	console.log({ isPlaying, loading });
-
 	return (
 		<Paper className={"Player"}>
 			<Box m={1} py={1}>
@@ -122,7 +120,7 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 					/>
 					{ref.current && (
 						<Box sx={{ position: "absolute", bottom: 7, width: "100%", height: 80 }} onMouseEnter={() => setShowHud(true)} onMouseLeave={() => setShowHud(false)}>
-							<Fade in={showHud}>
+							<Fade in={showHud} timeout={{ enter: 250, exit: 750 }}>
 								{loading ? (
 									<Typography>Loading</Typography>
 								) : (
@@ -145,7 +143,9 @@ export function Player({ src, onPlay, currentTime, onSeek, state, onPause, seekT
 												<IconButton size={"small"} onClick={playPause}>
 													{!isPlaying ? <PlayArrow /> : <Pause />}
 												</IconButton>
-												<Sync onClick={callbacks.synchronize}>Synchronize</Sync>
+												<IconButton onClick={callbacks.synchronize} size={"small"}>
+													<Sync>Synchronize</Sync>
+												</IconButton>
 
 												<Volume onChange={onVolumeChange} value={volume} />
 
