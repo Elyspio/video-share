@@ -10,12 +10,11 @@ public class FFmpeg
 {
     private readonly string ffmpegPath = Env.Get("FFMPEG_PATH", @"C:\Program Files\FFmpeg\bin\ffmpeg.exe")!;
     private readonly string input;
-
+    private readonly VideoFormat format;
     private readonly string output;
 
 
     private readonly string outputFolder = Env.Get("OUTPUT_FOLDER_PATH", Path.Join(Path.GetTempPath(), "video-share"))!;
-    private readonly Process proc;
 
 
     public Action<double> OnProgress = d => { };
@@ -23,21 +22,33 @@ public class FFmpeg
     public FFmpeg(string input, VideoFormat format)
     {
         this.input = input;
+        this.format = format;
         output = Path.Join(outputFolder, "output.mp4");
         EnsureOutputFolder();
+      
+    }
+
+
+    private async Task<Process> CreateProcess()
+    {
         var formatStr = format switch
         {
             VideoFormat.Streamable => "h264_nvenc",
             _ => throw new ArgumentOutOfRangeException(nameof(format), $"Not expected format value: {format}")
         };
 
+        var additionalArguments = "";
+        if (await FFprobe.HasSubtitle(input))
+        {
+            additionalArguments += $"-vf subtitles=\"{Path.GetFileName(input)}\"";
+        }
 
-        proc = new Process
+        var proc = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = ffmpegPath,
-                Arguments = $"-i \"{input}\" -c:v \"{formatStr}\"   -pix_fmt yuv420p -y \"{output}\" ",
+                Arguments = $"-i \"{input}\" -c:v \"{formatStr}\" {additionalArguments} -pix_fmt yuv420p -y \"{output}\" ",
                 WorkingDirectory = Path.GetDirectoryName(input),
                 CreateNoWindow = true,
                 RedirectStandardError = true,
@@ -47,7 +58,9 @@ public class FFmpeg
         };
 
         proc.EnableRaisingEvents = true;
+        return proc;
     }
+
 
     /// <summary>
     ///     Convert input file to a streamable format
@@ -58,6 +71,8 @@ public class FFmpeg
         var nbFrames = await GetFramesCount();
 
         var stderr = new StringBuilder();
+
+        var proc = await CreateProcess();
 
         proc.ErrorDataReceived += (proc, e) =>
         {

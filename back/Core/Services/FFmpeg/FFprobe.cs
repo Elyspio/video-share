@@ -209,6 +209,16 @@ public class FFprobe
 
         return JsonConvert.DeserializeObject<FFprobeResult>(json, Converter.Settings)!;
     }
+
+
+    public async static Task<bool> HasSubtitle(string path)
+    {
+
+        var data = await GetFileInfos(path);
+
+        return data.Streams.Any(stream => stream.CodecType == "subtitle");
+    }
+
 }
 
 internal static class Converter
